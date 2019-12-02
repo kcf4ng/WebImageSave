@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">image download and save</string>
+    <string name="Url_angryrabbit">https://i.imgur.com/YiVckoD.png</string>
+    <string name="Url_cannotfeed">https://i.imgur.com/7uM43bO.jpg</string>
+    <string name="Url_zoecry">https://i.imgur.com/eD3UgzB.png</string>
+    <string name="Url_1Kfile">https://i.imgur.com/e42a2Up.png</string>
 </resources>

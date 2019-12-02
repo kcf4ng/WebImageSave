@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -30,7 +31,7 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    OutputStream outputStream;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
         image_view = findViewById(R.id.image_view);
     }
 
+    OutputStream outputStream;
+    
+//TODO connect get Url >> downloadimage()
 
     private void DownloadImage() {
         new Thread(){
@@ -66,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
                 try
                 {
                     // create the HttpURLConnection
-                    url = new URL("https://i.imgur.com/7uM43bO.jpg");
+
+                    url = new URL(getResources().getString(R.string.Url_cannotfeed));
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
                     // 使用甚麼方法做連線
@@ -81,8 +86,10 @@ public class MainActivity extends AppCompatActivity {
 
                     // 伺服器回來的參數
                     InputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                    bitmap= BitmapFactory.decodeStream(inputStream);
-                    
+
+//                    bitmap= BitmapFactory.decodeStream(inputStream);
+
+                    inputstreamtofile(inputStream);
                 }
                 catch (Exception e)
                 {
@@ -100,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                Save(bitmap);
+//                Save(bitmap);
 
             }
         }.start();
@@ -160,6 +167,64 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Permission has already been granted
         }
+    }
+
+    public void inputstreamtofile(InputStream ins){
+
+        File filepath = Environment.getExternalStorageDirectory();
+        File dir = new File(filepath.getAbsolutePath()+"/Demo/"); //image slideshow dir
+
+        if(!dir.exists()){
+            dir.mkdir();
+        }
+
+        File file = new File(dir, "temp.png"); //temp file name
+
+        if(file.exists()){
+            file.delete();
+        }
+
+
+        try {
+            OutputStream os = new FileOutputStream(file);
+            int bytesRead = 0;
+            byte[] buffer = new byte[8192];
+            while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+
+            Log.d("file", "inputstreamtofile: "+file.length());
+
+            if(file.length() < 4096){
+                file.delete();
+                return;
+            }
+
+            File to = new File(dir,"test.png");
+            if(to.exists()){
+                to.delete();
+            }
+
+            file.renameTo(to);
+
+            //temp file
+            //length > 4K bytes; 4K is variable
+
+            //yes
+            //check 『index』的『png』is exists？
+            // yes > delete >> rename temp file
+            // no > rename temp file
+
+            //all index success > return server api
+
+            os.close();
+            ins.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     Button  btn_save;
